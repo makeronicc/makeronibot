@@ -1,0 +1,24 @@
+{
+  "projects": [
+    {
+      "user": "290419580721954816",
+      "project": "Doorbell On An Atom and teaching Eric to remember what he wrote",
+      "finished": true,
+      "current": false,
+      "nickname": "Dj",
+      "finishedAt": 1600528247189
+    },
+    {
+      "user": "643162844740845578",
+      "project": "The Makeroni Discord Bot",
+      "finished": false,
+      "current": true,
+      "createdAt": 1600526809651,
+      "nickname": "101stAdviceAndHelp (Eric)"
+    }
+  ],
+  "users": [],
+  "channels": [],
+  "zoomLink": "https://us02web.zoom.us/j/82538666919?pwd=TmltRXFkMkZOY1pYWG90Ni9wcGlvUT09",
+  "guild": "730415016716533931"
+}
