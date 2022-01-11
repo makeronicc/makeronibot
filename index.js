@@ -13,8 +13,16 @@ const FileSync = require('lowdb/adapters/FileSync')
  
 const adapter = new FileSync('db.json')
 const db = low(adapter)
+const offset = Number(process.env.TIME_OFFSET) || 0;
+const ZoomLink = process.env.ZOOMLINK
+
+console.log("Time offset should follow")
+console.log(process.env.TIME_OFFSET)
+console.log(`Time offset is ${offset}`)
 
 db.defaults({ projects: {}, users: [], channels: [] }).write()
+
+let guild;
 
 const channels = {
     sandbox: '756834681298747424',
@@ -24,14 +32,14 @@ const channels = {
 client.on("message", function (message) {
   const timeTaken = Date.now() - message.createdTimestamp;
   let content = message.content;
-  console.log(content);
-  console.log(message);
 
-  if(message.guild.name === "Makeroni") {
-      db.set('guild', message.guild.id).write();
-  }
+  guild = { name: message.guild.name, id: message.guild.id };
 
   if (message.author.bot) return;
+
+  if (content === "!help") {
+    message.reply('Well I can do a lot of things - you just gotta work em out for yourself ✊')
+  }
 
   if (content === "!ping") message.reply(`Pong! This message had a latency of ${timeTaken}ms.`);
   if (content === "!channel get id") message.reply(message.channel.id);
@@ -149,19 +157,17 @@ client.on('guildMemberAdd', member => {
 });
 
 
-const openDoors = schedule.scheduleJob('0 12 * * 6', date => {
-    const zoomLink = db.get('zoomLink').value()
+const openDoors = schedule.scheduleJob(`0 ${12+offset} * * 6`, date => {
     client.channels.fetch(channels.general).then(channel => {
-      channel.send(`Open Doors! Come and join us on Zoom at: ${zoomLink}`);
+      channel.send(`Open Doors! Come and join us on Zoom at: ${ZoomLink}`);
     }).catch(err => console.log(err))
 })
 
-const reminderMessage = schedule.scheduleJob('0 13-16 * * 6', date => {
-    const zoomLink = db.get('zoomLink').value()
+const reminderMessage = schedule.scheduleJob(`0 ${13+offset}-${15+offset} * * 6`, date => {
     getMessages(1).then(messages => {
       if(messages[0].author.username !== "Makeronibot") {
         client.channels.fetch(channels.general).then(channel => {
-            channel.send(`Come along, join us on Zoom at: ${zoomLink}`);
+            channel.send(`Come along, join us on Zoom at: ${ZoomLink}`);
         }).catch(err => console.log(err))
       }
     })
@@ -170,5 +176,8 @@ const reminderMessage = schedule.scheduleJob('0 13-16 * * 6', date => {
 const server = http.createServer((function(request,response){
     response.writeHead(200, {"Content-Type" : "text/plain"}); 
     response.end("OK");
+    getProjects().then(items => {
+        console.log(items);
+    }).catch(console.log)
 }));
 server.listen(8080);
